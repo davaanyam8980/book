@@ -6,6 +6,8 @@ import {
   Image,
   View,
   ImageBackground,
+  TouchableOpacity,
+  Touchable,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useState, useEffect} from 'react/cjs/react.development';
@@ -30,6 +32,18 @@ const Description = props => {
 
   const image =
     'https://img1.wsimg.com/isteam/ip/95dc8c4f-baec-40ec-a525-5776ce6b0d3c/booksbluebanner.jpg';
+  const [clicked, setClicked] = useState(false);
+  const [writting, setWritting] = useState(false);
+  const [textComment, setCommentText] = useState();
+  const [textAcumlator, setTextAcumlator] = useState([]);
+
+  console.log('text', textComment);
+  const createComment = () => {
+    setTextAcumlator(textAcumlator => [...textAcumlator, {textComment}]);
+  };
+  const onPress = () => {
+    setClicked(!clicked);
+  };
 
   return (
     <ImageBackground
@@ -42,43 +56,85 @@ const Description = props => {
         alignItems: 'center',
       }}>
       <View style={styles.card}>
-        <Image
-          source={{uri: props.route.params.image}}
-          style={{
-            width: 200,
-            height: 250,
-            borderRadius: 2,
-            borderColor: '#b3ffff',
-            borderWidth: 1,
-          }}
-        />
-        <View>
-          <View style={{flexDirection: 'row'}}>
-            <Text style={styles.title}>Name:</Text>
-            <Text>{props.route.params.name}</Text>
+        <ScrollView>
+          <Image
+            source={{uri: props.route.params.image}}
+            style={{
+              width: 200,
+              height: 250,
+              borderRadius: 2,
+              borderColor: '#b3ffff',
+              borderWidth: 1,
+              marginLeft: 40,
+              marginTop: 40,
+            }}
+          />
+          <View style={{marginVertical: 20}}>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={styles.title}>Name:</Text>
+              <Text>{props.route.params.name}</Text>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={styles.title}>Authors:</Text>
+              <Text>{props.route.params.author}</Text>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={styles.title}>Category :</Text>
+              <Text>{props.route.params.categories}</Text>
+            </View>
+            <TouchableOpacity onPress={onPress}>
+              <View style={{flexDirection: 'row-reverse'}}>
+                {!clicked && (
+                  <Text style={{color: '#808080'}}>see more...</Text>
+                )}
+              </View>
+            </TouchableOpacity>
           </View>
-          <View style={{flexDirection: 'row'}}>
-            <Text style={styles.title}>Authors:</Text>
-            <Text>{props.route.params.author}</Text>
-          </View>
-          <View style={{flexDirection: 'row'}}>
-            <Text style={styles.title}>Category :</Text>
-            <Text>{props.route.params.categories}</Text>
-          </View>
-        </View>
+          {clicked &&
+            textAcumlator.map(text => {
+              return (
+                <View
+                  style={{
+                    marginVertical: 10,
+                    width: '100%',
+                    backgroundColor: '#e6e6e6',
+                    borderRadius: 10,
+                    padding: 10,
+                  }}>
+                  <Text style={{fontWeight: 'bold'}}>Guest</Text>
+                  <Text>{text.textComment}</Text>
+                </View>
+              );
+            })}
+          {clicked && (
+            <TextInput
+              style={{
+                width: '100%',
+                backgroundColor: '#d9d9d9',
+                borderRadius: 10,
+                padding: 10,
+                marginBottom: 10,
+              }}
+              placeholder="write comment"
+              onEndEditing={createComment}
+              onChangeText={setCommentText}
+            />
+          )}
 
-        <View
-          style={{
-            width: '100%',
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-            borderTopColor: '#b3b3b3',
-            borderTopWidth: 1,
-            paddingTop: 11,
-          }}>
-          <Text>like</Text>
-          <Text>comment</Text>
-        </View>
+          <View
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              borderTopColor: '#b3b3b3',
+              borderTopWidth: 1,
+              paddingTop: 11,
+            }}>
+            <TouchableOpacity onPress={onPress}>
+              <Text>comment</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
     </ImageBackground>
   );
